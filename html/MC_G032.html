@@ -1,0 +1,77 @@
+   <!doctype html>
+        <html lang="ja">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+            <link rel="stylesheet" href="../../../share/assets/css/style.css">
+            <link rel="stylesheet" href="../../../share/assets/css/overwrite.css"> </head>
+
+        <body id="index">
+            <div class="global--wrapper">
+                <h1 class="global--headline_1">複素数平面</h1><br>
+<h2 class="global--headline_2">複素数と座標の関係</h2><br>
+複素数\(a + bi\)（ただし、\(a\)、\(b\)は実数）を座標平面上の点\((a, b)\)で表します。<br>
+<span class="global--icon-point_green">例</span><br>
+\(3 + 2i\)の場合<br>
+このとき!!<br>
+座標軸を<span class="global--text-red">複素数平面</span>と呼び、\(x\)軸を<span class="global--text-red">実軸</span>、\(y\)軸を<span class="global--text-red">虚軸</span>と呼びます。<br>
+<h2 class="global--headline_2">共役複素数</h2><br>
+複素数\(a + bi\)（\(a\)、\(b\)は実数）に対して、<span class="global--text-blue">\(a - bi\)</span>を<span class="global--text-red">共役</span>〔きょうやく〕<span class="global--text-red">複素数</span>と申します。<br>
+で!!　複素数\(z\)の共役複素数を<span class="global--text-blue">\(\overline{z}\)</span>と表します。<br>
+①\(\overline{z_1 + z_2} = \overline{z_1} + \overline{z_2}\)<br>
+②\(\overline{z_1 - z_2} = \overline{z_1} - \overline{z_2}\)<br>
+③\(\overline{z_1z_2} = \overline{z_1}\overline{z_2}\)<br>
+④\(\overline{\left ( \displaystyle\frac{z_2}{z_1} \right )} = \displaystyle\frac{\overline{z_2}}{\overline{z_1}}\)（ただし、 \(z_1 \neq 0\)）<br>
+ちなみに、\(z\)が実数である条件は…<br>
+\(z = \overline{z}\)<br>
+となります。理由は簡単…<br>
+\(z = z + 0i\)<br>
+のとき<br>
+\overline{z} = z - 0i<br>
+つまり!　\(z = \overline{z}\)となります。<br>
+<h2 class="global--headline_2">複素数の絶対値</h2><br>
+\(a + bi\)と原点\(\rm O\)との距離を複素数\(a + bi\)の<span class="global--text-red">絶対値</span>といい、<span class="global--text-blue">\(|a + bi|\)</span>で表します。<br>
+とゆーわけで…<br>
+\(|a + bi| = \sqrt{a^2 + b^2}\)<br>
+つまり!<br>
+\(z = a + bi\)のとき<br>
+\(|z| = \sqrt{a^2 + b^2}\)<br>
+ということです。<br>
+①\(|z|^2 = z\overline{z}\)<br>
+②\(|z_1z_2| = |z_1||z_2|\)<br>
+③\(\left |\displaystyle\frac{z_2}{z_1} \right | = \displaystyle\frac{|z_2|}{|z_1|}\)（ただし、\( z_1 \neq 0\)）<br>
+<span class="global--icon-point_green">例</span><br>
+\(z = 3 + 2i\)の絶対値を求めてみよう。<br>
+求め方①<br>
+\(|z| = \sqrt{3^2 + 2^2} = \sqrt{13}\)<br>
+つまり、\(|z|^2 = (\sqrt{13})^2 =\)<span class="global--text-red">\(13\)</span><br>
+求め方②<br>
+\(\overline{z} = 3 - 2i\)だから<br>
+\(z\overline{z} = (3 + 2i)(3 - 2i)\)<br>
+\(= 3^2 - (2i)^2\)<br>
+\(= 9 - 4i^2)<br>
+\(= 9 + 4\)<br>
+\(=\)<span class="global--text-red">\(13\)</span><br>
+<h2 class="global--headline_2">複素数平面における演算</h2><br>
+まさに、これは座標平面におけるベクトルの和の話と一致します。<br>
+ベクトルの成分の計算を思い出して!!<br>
+<span class="global--text-blue">\((a, b) + (c, d) = (a + c, b + d)\)</span><br>
+ホラ!! 同じでしょ!!<br>
+これも、座標平面上のベクトルの差の話とピッタリ一致!!<br>
+思い出してごらん!!<br>
+<span class="global--text-blue">\((a, b) - (c, d) = (a - c, b - d)\)</span><br>
+すると、\(z_1 = a + bi\)、\( z_2 = c + di\)に対して、<br>
+\(z_2 - z_1 = (a - b) + (c - d)i\)<br>
+\(|z_2 - z_1| = \sqrt{(a - b)^2 + (c - d)^2}\)となり<br>
+2点\((a, b)\)と\( (c, d)\)の<span class="global--text-red">距離</span>を表してます。<br>
+\(k\)を実数としたとき<br>
+\(k(a + bi) = ka + kbi\)<br>
+これも、座標平面上のベクトルを実数倍するときの話と一致します。<br>
+<span class="global--text-blue">\(k(a, b) = (ka, kb)\)</span>
+            </div>
+            <script src="../../../share/assets/js/jquery-2.1.4.min.js"></script>
+            <script src="https://cdn.nnn.ed.nico/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript"></script>
+        </body>
+
+        </html>
