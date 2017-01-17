@@ -61,10 +61,20 @@ class Doc2Txt
 
     def add_img data
         id = @base_fn.split(".").first
+        #通常の画像にimgタグを付ける
         data.gsub!(/#{id}.*\.png/) { |v|
             %Q[<div class="global--image_container">
             <img src="#{v}" alt="">
             </div>
+            ]
+        }
+        #バルーンとセットの画像にタグ付け
+        data.gsub!(/^.*\/share\/assets\/img\/.*\.png/) { |v|        
+            %Q[<dl class="global--balloon"><dt><img src="#{v}" alt=""></dt>
+              <dd>
+                セリフ
+              </dd>
+            </dl>
             ]
         }
     end
@@ -167,6 +177,7 @@ class Doc2Txt
 
         }.join("").chomp("")
 
+        data.gsub!(/\n/,"<br>\n")
         add_img(data)
         add_tex(data)
 
@@ -188,7 +199,7 @@ class Doc2Txt
             <script src="https://cdn.nnn.ed.nico/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript"></script>
         </body>
 
-        </html>' % data.gsub(/\n/,"<br>\n")
+        </html>' % data
         
     end
 
