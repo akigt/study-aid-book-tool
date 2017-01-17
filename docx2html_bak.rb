@@ -94,12 +94,12 @@ class Doc2Txt
             str = "strong"
         when "aff" then  #斜体 
             str = "em"
-        when "affffff0" then  #公式いろいろ
-            result = "テスト"
-        when "affff7" then  #黄色の枠 
-            result = "global--block-message_yellow"
+        when "dashed" then  #点線 正しいval不明
+            str = "dashed"
+        when "ac" then  #二重 
+            str = "double"
         else
-            result = "aa"
+            str = ""
         end
         result
     end
@@ -112,10 +112,6 @@ class Doc2Txt
             "<span class=\"global--icon-point_#{$1}\">" + inside + "</span>\n"
         when /global--text-([\w]*)/
             "<span class=\"global--text-#{$1}\">" + inside + "</span>"
-        when "テスト"
-            "<AAAAA>" + inside + "</AAAAA>\n"
-        when /global--block-message_([\w]*)/
-            "<aside class=\"global--block-message_#{$1}\">" + inside + "</aside>"
         else 
             inside
         end
@@ -125,11 +121,13 @@ class Doc2Txt
     def parseStyle elm
         #XMLの要素からスタイルを抜き取りテキストにspanタグをくっつける
          elm.get_elements(".//w:r").to_a.map { |e| 
+
             #教科によって文字の色のつけ方が違うので場合分け・・・
             if (rStyle = e.elements[".//w:color"]) or (rStyle = e.elements[".//w:rStyle"]) then 
                 rStyleVal = rStyle.attributes["w:val"]
                 cssName = style(rStyleVal)
                 surrounding(cssName,e.elements[".//w:t"].text.gsub(/\n/, ""))
+                # cssName + e.elements[".//w:t"].text.gsub(/\n/, "") + "</span>"
             #スタイルの無い通常の文の場合
             elsif normalText = e.elements[".//w:t"] then 
                 if e.get_elements(".//w:t")[1] then #一つのw:rタグ内にw:tが二つあるケースに対処するため。
@@ -153,12 +151,12 @@ class Doc2Txt
                 rStyleVal = rStyle.attributes["w:val"]
                 # puts rStyleVal
                 cssName = style(rStyleVal)
-                # if cssName
+                if cssName
                     surrounding(cssName,parseStyle(elm))
-                # else
-                    # puts !!cssName
+                    # cssName + parseStyle(elm) + "</span>\n"
+                else
                     # elm.get_elements(".//w:t").to_a.map { |e| e.text }.join("").chomp("") + "\n"
-                # end
+                end
 
             # 通常のパラグラフのための処理
             else
