@@ -68,48 +68,62 @@ class Doc2Txt
             </div>
             ]
         }
-        #バルーンとセットの画像にタグ付け
+        # バルーンとセットの画像にタグ付け
         data.gsub!(/^.*\/share\/assets\/img\/.*\.png/) { |v|        
-            %Q[<dl class="global--balloon"><dt><img src="#{v}" alt=""></dt>
-              <dd>
-                セリフ
-              </dd>
-            </dl>
-            ]
+            %Q[<dt><img src="#{v}" alt=""></dt><dd>]
         }
     end
 
-    def add_tex data
+    def removeUnnecessaryTag data
         data.gsub!(/<\/span><span class=".*?">/,"")
+        # data.gsub!(/<\/aside><aside class=".*?">/,"")
     end
 
     # XMLから抽出した値によって適用するスタイルを変更する
     #<w:rStyle w:val="af8"/> 8は青 6は緑？ 4は赤
     def style val
-        puts val
+        # puts val
         case val
+        #2A1ACC1F paraID波線 pstyle aff
         when "a0","ab" then #見出し1 
             result = "global--headline_1"
         when "a" then #見出し2
             result = "global--headline_2"
-        when "af1","af2" then #アノテーション
-            str = "annotation"
-        when "aff4","af4","FF0000" then  #赤
-            result = "global--text-red"
-        when "afffffc","af5","af6","00FF00" then  #例
+        # when "af1","af2" then #アノテーション
+        #     result = "annotation"
+        when "af3" then #赤枠
+            result = "global--block-message_strong_red"
+        when "afd" then #青枠
+            result = "global--block-message_strong_blue"
+        when "aff" then #灰枠
+            result = "global--block-message_strong_gray"
+        when "afff9" then #波線の枠
+            result = "global--balloon"
+        #ラベル類
+        when "afff2" then #赤ラベル 
+            result = "global--icon-point_red"
+        when "afffffd","afffffc","af5","af6","00FF00" then  #緑ラベル
             result = "global--icon-point_green"
-        when "affff1","af7","af8","afe","0000FF","0070C0" then  #青
+        when "affffff1" then #青ラベル 
+            result = "global--icon-point_blue"
+        when "affffff3" then #紫ラベル 
+            result = "global--icon-point_purple"
+        when "affffff5" then #灰ラベル 
+            result = "global--icon-point_gray"
+        when "aff4","af4","FF0000" then  #赤字
+            result = "global--text-red"
+        when "affff1","af7","af8","afe","0000FF","0070C0" then  #青字
             result = "global--text-blue"
-        when "af9" then  #太字 
-            str = "strong"
-        when "aff" then  #斜体 
-            str = "em"
+        # when "af9" then  #太字 
+        #     result = "strong"
+        # when "aff" then  #斜体 
+        #     result = "em"
         when "affffff0" then  #公式いろいろ
             result = "テスト"
-        when "affff7" then  #黄色の枠 
+        when "affff7","affffe" then  #黄色の枠 
             result = "global--block-message_yellow"
         else
-            result = "aa"
+            result = "undefined"
         end
         result
     end
@@ -119,13 +133,16 @@ class Doc2Txt
         when /global--headline_([\w]*)/
             "<h#{$1} class=\"global--headline_#{$1}\">" + inside + "</h#{$1}>\n"
         when /global--icon-point_([\w]*)/
-            "<span class=\"global--icon-point_#{$1}\">" + inside + "</span>\n"
+            "<span class=\"global--icon-point_#{$1}\">" + inside + "</span>"
         when /global--text-([\w]*)/
             "<span class=\"global--text-#{$1}\">" + inside + "</span>"
         when "テスト"
             "<AAAAA>" + inside + "</AAAAA>\n"
         when /global--block-message_([\w]*)/
             "<aside class=\"global--block-message_#{$1}\">" + inside + "</aside>"
+        when "global--balloon"
+            "<dl class=\"global--balloon\">\n" + inside + "</dd></dl>"
+            # "<AAAAA>" + inside + "</AAAAA>\n"
         else 
             inside
         end
@@ -149,7 +166,7 @@ class Doc2Txt
                     normalText.text
                 end
             end
-            }.join("").chomp("")
+            }.join("").chomp("") + "\n"
     end
 
     def parse
@@ -161,15 +178,8 @@ class Doc2Txt
             #　パラグラフ全体にスタイルがあった場合の処理
             if rStyle = elm.elements[".//w:pStyle"] then 
                 rStyleVal = rStyle.attributes["w:val"]
-                # puts rStyleVal
                 cssName = style(rStyleVal)
-                # if cssName
-                    surrounding(cssName,parseStyle(elm))
-                # else
-                    # puts !!cssName
-                    # elm.get_elements(".//w:t").to_a.map { |e| e.text }.join("").chomp("") + "\n"
-                # end
-
+                surrounding(cssName,parseStyle(elm))
             # 通常のパラグラフのための処理
             else
                 parseStyle(elm) + "\n"
@@ -177,9 +187,9 @@ class Doc2Txt
 
         }.join("").chomp("")
 
+        removeUnnecessaryTag(data)
         data.gsub!(/\n/,"<br>\n")
         add_img(data)
-        add_tex(data)
 
         # t-htmlのスニペットのタグ
         '   <!doctype html>
