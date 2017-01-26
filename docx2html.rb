@@ -100,6 +100,7 @@ class Doc2Txt
         when "afff9" then #波線の枠
             result = "global--balloon"
         #ラベル類
+
         when "afff2" then #赤ラベル 
             result = "global--icon-point_red"
         when "afffffd","afffffc","af5","af6","00FF00" then  #緑ラベル
@@ -114,8 +115,8 @@ class Doc2Txt
             result = "global--text-red"
         when "affff1","af7","af8","afe","0000FF","0070C0" then  #青字
             result = "global--text-blue"
-        # when "af9" then  #太字 
-        #     result = "strong"
+        when "affa" then  #太字 
+            result = "global--text-strong"
         # when "aff" then  #斜体 
         #     result = "em"
         when "affffff0" then  #公式いろいろ
@@ -142,7 +143,6 @@ class Doc2Txt
             "<aside class=\"global--block-message_#{$1}\">" + inside + "</aside>"
         when "global--balloon"
             "<dl class=\"global--balloon\">\n" + inside + "</dd></dl>"
-            # "<AAAAA>" + inside + "</AAAAA>\n"
         else 
             inside
         end
@@ -166,7 +166,7 @@ class Doc2Txt
                     normalText.text
                 end
             end
-            }.join("").chomp("") + "\n"
+            }.join("").chomp("")
     end
 
     def parse
@@ -182,7 +182,7 @@ class Doc2Txt
                 surrounding(cssName,parseStyle(elm))
             # 通常のパラグラフのための処理
             else
-                parseStyle(elm) + "\n"
+                "<p>" + parseStyle(elm) + "</p>"
             end
 
         }.join("").chomp("")
