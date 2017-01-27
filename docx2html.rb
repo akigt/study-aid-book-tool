@@ -181,9 +181,9 @@ class Doc2Txt
         #テーブルの行内部の列の要素を取り出し<td>タグで囲んで、内部のテキストをパースする処理を行う
          elm.get_elements(".//w:tc").to_a.map { |column|
             if i == 0 then
-                "<th>" + parseStyle(column).gsub(/\n/,"") + "</th>"
+                "<th>" + parseStyle(column) + "</th>"
             else
-                "<td>" + parseStyle(column).gsub(/\n/,"") + "</td>"
+                "<td>" + parseStyle(column) + "</td>"
             end
             }.join("").chomp("")
     end
