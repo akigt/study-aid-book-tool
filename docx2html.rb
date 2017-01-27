@@ -80,11 +80,10 @@ class Doc2Txt
     end
 
     # XMLから抽出した値によって適用するスタイルを変更する
-    #<w:rStyle w:val="af8"/> 8は青 6は緑？ 4は赤
     def style val
         # puts val
         case val
-        #2A1ACC1F paraID波線 pstyle aff
+
         when "a0","ab" then #見出し1 
             result = "global--headline_1"
         when "a" then #見出し2
@@ -99,8 +98,8 @@ class Doc2Txt
             result = "global--block-message_strong_gray"
         when "afff9" then #波線の枠
             result = "global--balloon"
+        
         #ラベル類
-
         when "afff2" then #赤ラベル 
             result = "global--icon-point_red"
         when "afffffd","afffffc","af5","af6","00FF00" then  #緑ラベル
@@ -160,7 +159,7 @@ class Doc2Txt
             #スタイルの無い通常の文の場合
             elsif normalText = e.elements[".//w:t"] then 
                 if e.get_elements(".//w:t")[1] then #一つのw:rタグ内にw:tが二つあるケースに対処するため。
-                    #.//w:tでは最初のtのみを取得するので一部の文字が消える
+                    #.//w:tでは最初のtのみを取得するので二つ以上あると一部の文字が消える
                     "\n" + e.get_elements(".//w:t")[1].text
                 else
                     normalText.text
@@ -169,16 +168,36 @@ class Doc2Txt
             }.join("").chomp("")
     end
 
+    #表の行をパースするための関数
+    def parseTableRow elm
+        #テーブル内の各行要素を取り出し<tr>タグで囲んで、列をパースする処理を行う
+         elm.get_elements(".//w:tr").to_a.map.with_index { |row, i|
+            "<tr>" + parseTableColumn(row,i) + "</tr>"
+            }.join("").chomp("")
+    end
+
+    #表の列をパースするための関数
+    def parseTableColumn(elm,i)
+        #テーブルの行内部の列の要素を取り出し<td>タグで囲んで、内部のテキストをパースする処理を行う
+         elm.get_elements(".//w:tc").to_a.map { |column|
+            if i == 0 then
+                "<th>" + parseStyle(column).gsub(/\n/,"") + "</th>"
+            else
+                "<td>" + parseStyle(column).gsub(/\n/,"") + "</td>"
+            end
+            }.join("").chomp("")
+    end
+
     def parse
-        # OpenXMLをパースしてテキストだけ抽出
+        # OpenXMLをパースしてテキストを抽出
         doc = REXML::Document.new(check_br(@xml_name))
 
         data = doc.elements.to_a("//w:p").map { |elm|
 
             #　パラグラフ全体にスタイルがあった場合の処理
-            if rStyle = elm.elements[".//w:pStyle"] then 
-                rStyleVal = rStyle.attributes["w:val"]
-                cssName = style(rStyleVal)
+            if pStyle = elm.elements[".//w:pStyle"] then 
+                pStyleVal = pStyle.attributes["w:val"]
+                cssName = style(pStyleVal)
                 surrounding(cssName,parseStyle(elm))
             # 通常のパラグラフのための処理
             else
@@ -186,6 +205,12 @@ class Doc2Txt
             end
 
         }.join("").chomp("")
+
+        #docx内にテーブルがあった場合、テキストデータの最後にテーブルを生成
+        table = doc.elements.to_a("//w:tbl").map { |elm|
+            "<table border=\"1\">" + parseTableRow(elm) + "</table>"
+        }.join("").chomp("")
+        data += table
 
         removeUnnecessaryTag(data)
         data.gsub!(/\n/,"<br>\n")
