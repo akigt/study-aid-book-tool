@@ -221,7 +221,7 @@ class Doc2Txt
             }.join("").chomp("")
     end
 
-    #表の列をパースするための関数
+    #表の列をパースするための関数。第二引数で行のインデックスiを受け取りthタグとtdタグを使い分ける
     def parseTableColumn(elm,i)
         #テーブルの行内部の列の要素を取り出し<td>タグで囲んで、内部のテキストをパースする処理を行う
          elm.get_elements(".//w:tc").to_a.map { |column|
@@ -230,7 +230,7 @@ class Doc2Txt
             if !cellData.include?("</") and !(cellData == "") then
                 cellData = "<p>" + cellData + "</p>"
             end
-
+            #最初の行だったらthタグを使用する
             if i == 0 then
                 "<th>" + cellData + "</th>"
             else
@@ -245,7 +245,7 @@ class Doc2Txt
 
         data = doc.elements.to_a("//w:p").map { |elm|
 
-            #　パラグラフ全体にスタイルがあった場合の処理
+            # パラグラフ全体にスタイルがあった場合の処理
             if pStyle = elm.elements[".//w:pStyle"] then 
                 pStyleVal = pStyle.attributes["w:val"]
                 cssName = style(pStyleVal)
