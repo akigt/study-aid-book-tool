@@ -79,6 +79,51 @@ class Doc2Txt
         # data.gsub!(/<\/aside><aside class=".*?">/,"")
     end
 
+    def t_html data
+         # 参考書用テキスト、t-htmlのスニペットのタグ
+        %Q[<!doctype html>
+        <html lang="ja">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+            <link rel="stylesheet" href="../../../share/assets/css/style.css">
+            <link rel="stylesheet" href="../../../share/assets/css/overwrite.css"> </head>
+
+        <body id="index">
+            <div class="global--wrapper">
+                #{data}
+            </div>
+            <script src="../../../share/assets/js/jquery-2.1.4.min.js"></script>
+            <script src="https://cdn.nnn.ed.nico/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript"></script>
+        </body>
+
+        </html>]
+    end
+
+    def t_html_lecture data
+         # 授業用テキスト、t-html-lectureのスニペットのタグ
+        %Q[<!doctype html>
+        <html lang="ja">
+        
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+            <link rel="stylesheet" href="../../../../share/assets/css/style.css">
+            <link rel="stylesheet" href="../../../../share/assets/css/overwrite.css"> </head>
+        
+        <body id="index">
+            <div class="global--wrapper">
+              #{data}
+            </div>
+            <script src="../../../share/assets/js/jquery-2.1.4.min.js"></script>
+            <script src="https://cdn.nnn.ed.nico/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript"></script>
+        </body>
+        
+        </html>]
+        #jqueryの階層が違う？
+    end
+
     # XMLから抽出した値によって適用するスタイルを変更する
     def style val
         # puts val
@@ -222,26 +267,17 @@ class Doc2Txt
         data.gsub!(/\n/,"<br>\n")
         add_img(data)
 
-        # t-htmlのスニペットのタグ
-        '   <!doctype html>
-        <html lang="ja">
+        #与えられたコマンドライン引数によって使用する雛形を選択
+        case ARGV[0]
+        when "lecture"
+            # t-html-lectureのスニペットのタグ
+            t_html_lecture(data)
+        else
+            # t-htmlのスニペットのタグ
+            t_html(data)
+        end
 
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
-            <link rel="stylesheet" href="../../../share/assets/css/style.css">
-            <link rel="stylesheet" href="../../../share/assets/css/overwrite.css"> </head>
 
-        <body id="index">
-            <div class="global--wrapper">
-                %s
-            </div>
-            <script src="../../../share/assets/js/jquery-2.1.4.min.js"></script>
-            <script src="https://cdn.nnn.ed.nico/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript"></script>
-        </body>
-
-        </html>' % data
-        
     end
 
     def output data
