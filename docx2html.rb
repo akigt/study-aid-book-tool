@@ -180,10 +180,16 @@ class Doc2Txt
     def parseTableColumn(elm,i)
         #テーブルの行内部の列の要素を取り出し<td>タグで囲んで、内部のテキストをパースする処理を行う
          elm.get_elements(".//w:tc").to_a.map { |column|
+            cellData = parseStyle(column)
+            #装飾タグがないセルにはpタグを付与する
+            if !cellData.include?("</") and !(cellData == "") then
+                cellData = "<p>" + cellData + "</p>"
+            end
+
             if i == 0 then
-                "<th>" + parseStyle(column) + "</th>"
+                "<th>" + cellData + "</th>"
             else
-                "<td>" + parseStyle(column) + "</td>"
+                "<td>" + cellData + "</td>"
             end
             }.join("").chomp("")
     end
