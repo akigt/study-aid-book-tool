@@ -243,25 +243,22 @@ class Doc2Txt
         # OpenXMLをパースしてテキストを抽出
         doc = REXML::Document.new(check_br(@xml_name))
 
-        data = doc.elements.to_a("//w:p").map { |elm|
-
+        data = REXML::XPath.match(doc.root,'//*[self::w:tbl or self::w:p[not(ancestor::w:tbl)]]').map { |elm|
+            
+            # テーブルがあったときの処理
+            if elm.name == "tbl" then
+                "<table>" + parseTableRow(elm) + "</table>"
             # パラグラフ全体にスタイルがあった場合の処理
-            if pStyle = elm.elements[".//w:pStyle"] then 
+            elsif pStyle = elm.elements[".//w:pStyle"] then 
                 pStyleVal = pStyle.attributes["w:val"]
                 cssName = style(pStyleVal)
                 surrounding(cssName,parseStyle(elm))
-            # 通常のパラグラフのための処理
+            # スタイルのない通常のパラグラフのための処理
             else
                 "<p>" + parseStyle(elm) + "</p>"
             end
 
         }.join("").chomp("")
-
-        #docx内にテーブルがあった場合、テキストデータの最後にテーブルを生成
-        table = doc.elements.to_a("//w:tbl").map { |elm|
-            "<table border=\"1\">" + parseTableRow(elm) + "</table>"
-        }.join("").chomp("")
-        data += table
 
         removeUnnecessaryTag(data)
         data.gsub!(/\n/,"<br>\n")
