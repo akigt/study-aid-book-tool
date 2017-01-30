@@ -62,66 +62,129 @@ class Doc2Txt
     def add_img data
         id = @base_fn.split(".").first
         #通常の画像にimgタグを付ける
-        data.gsub!(/#{id}.*\.png/) { |v|
-            %Q[<div class="global--image_container">
-            <img src="#{v}" alt="">
-            </div>
-            ]
+        data.gsub!(/#{id}.*?\.png/) { |v|
+            %Q[<div class="global--image_container"><img src="#{v}" alt=""></div>]
         }
         # バルーンとセットの画像にタグ付け
-        data.gsub!(/^.*\/share\/assets\/img\/.*\.png/) { |v|        
+        data.gsub!(/[^>]*\/share\/assets\/img\/.*\.png/) { |v|        
             %Q[<dt><img src="#{v}" alt=""></dt><dd>]
         }
     end
 
     def removeUnnecessaryTag data
+        #不必要に連続するspanタグを消す。classが違い、役割も違うspanタグも消してしまうのでもっと正確な正規表現にしたい
         data.gsub!(/<\/span><span class=".*?">/,"")
         # data.gsub!(/<\/aside><aside class=".*?">/,"")
     end
 
+    def t_html data
+         # 参考書用テキスト、t-htmlのスニペットのタグ
+        %Q[<!doctype html>
+        <html lang="ja">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+            <link rel="stylesheet" href="../../../share/assets/css/style.css">
+            <link rel="stylesheet" href="../../../share/assets/css/overwrite.css"> </head>
+
+        <body id="index">
+            <div class="global--wrapper">
+                #{data}
+            </div>
+            <script src="../../../share/assets/js/jquery-2.1.4.min.js"></script>
+            <script src="https://cdn.nnn.ed.nico/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript"></script>
+        </body>
+
+        </html>]
+    end
+
+    def t_html_lecture data
+         # 授業用テキスト、t-html-lectureのスニペットのタグ
+        %Q[<!doctype html>
+        <html lang="ja">
+        
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+            <link rel="stylesheet" href="../../../../share/assets/css/style.css">
+            <link rel="stylesheet" href="../../../../share/assets/css/overwrite.css"> </head>
+        
+        <body id="index">
+            <div class="global--wrapper">
+              #{data}
+            </div>
+            <script src="../../../../share/assets/js/jquery-2.1.4.min.js"></script>
+            <script src="https://cdn.nnn.ed.nico/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript"></script>
+        </body>
+        
+        </html>]
+        #jqueryの階層が違う？
+    end
+
     # XMLから抽出した値によって適用するスタイルを変更する
-    #<w:rStyle w:val="af8"/> 8は青 6は緑？ 4は赤
     def style val
         # puts val
         case val
-        #2A1ACC1F paraID波線 pstyle aff
+
+        #見出し類
         when "a0","ab" then #見出し1 
             result = "global--headline_1"
         when "a" then #見出し2
             result = "global--headline_2"
-        # when "af1","af2" then #アノテーション
-        #     result = "annotation"
+        when "a3" then #見出し3
+            result = "global--headline_3"
+   
+        #メッセージ枠類
         when "af3" then #赤枠
             result = "global--block-message_strong_red"
-        when "afd" then #青枠
+        when "af7" then #緑枠
+            result = "global--block-message_strong_green"
+        when "afd" then #青枠 
             result = "global--block-message_strong_blue"
         when "aff" then #灰枠
             result = "global--block-message_strong_gray"
-        when "afff9" then #波線の枠
+        when "af5" then #黄枠
+            result = "global--block-message_strong_yellow"
+        when "afb" then #紫枠
+            result = "global--block-message_strong_purple"
+        when "afff9" then #ふきだし・バルーン用
             result = "global--balloon"
+        
+        #色付きメッセージブロック
+        when "affff7","affffe" then  #黄色のブロック、罫線なし
+            result = "global--block-message_yellow"
+        when "afffff8" then  #灰色のブロック、罫線なし
+            result = "global--block-message_gray"
+        
         #ラベル類
         when "afff2" then #赤ラベル 
             result = "global--icon-point_red"
-        when "afffffd","afffffc","af5","af6","00FF00" then  #緑ラベル
+        when "afffffd","afffffc","af6","00FF00" then  #緑ラベル
             result = "global--icon-point_green"
         when "affffff1" then #青ラベル 
             result = "global--icon-point_blue"
-        when "affffff3" then #紫ラベル 
+        when "affffff2","affffff3" then #紫ラベル 
             result = "global--icon-point_purple"
         when "affffff5" then #灰ラベル 
             result = "global--icon-point_gray"
-        when "aff4","af4","FF0000" then  #赤字
+        when "afffffa" then #黄色ラベル
+            result = "global--icon-point_yellow"
+            
+        #装飾文字類
+        when "aff3","aff4","af4","FF0000" then  #赤字
             result = "global--text-red"
-        when "affff1","af7","af8","afe","0000FF","0070C0" then  #青字
+        when "affff0","affff1","af8","afe","0000FF","0070C0" then  #青字
             result = "global--text-blue"
-        # when "af9" then  #太字 
-        #     result = "strong"
-        # when "aff" then  #斜体 
-        #     result = "em"
-        when "affffff0" then  #公式いろいろ
-            result = "テスト"
-        when "affff7","affffe" then  #黄色の枠 
-            result = "global--block-message_yellow"
+        when "affa","affffffb","affffffa" then  #太字 
+            result = "global--text-strong"
+        when "aff9" then  #大文字 
+            result = "global--text-big"
+        when "aff2" then  #小文字 
+            result = "global--text-small"
+
+        # when "affffff0" then  #公式いろいろ
+        #     result = "テスト"
         else
             result = "undefined"
         end
@@ -131,22 +194,31 @@ class Doc2Txt
     def surrounding(cssName,inside)
         case cssName
         when /global--headline_([\w]*)/
-            "<h#{$1} class=\"global--headline_#{$1}\">" + inside + "</h#{$1}>\n"
+            "<h#{$1} class=\"global--headline_#{$1}\">" + inside + "</h#{$1}>"
         when /global--icon-point_([\w]*)/
             "<span class=\"global--icon-point_#{$1}\">" + inside + "</span>"
         when /global--text-([\w]*)/
             "<span class=\"global--text-#{$1}\">" + inside + "</span>"
-        when "テスト"
-            "<AAAAA>" + inside + "</AAAAA>\n"
         when /global--block-message_([\w]*)/
             "<aside class=\"global--block-message_#{$1}\">" + inside + "</aside>"
         when "global--balloon"
-            "<dl class=\"global--balloon\">\n" + inside + "</dd></dl>"
-            # "<AAAAA>" + inside + "</AAAAA>\n"
+            "<dl class=\"global--balloon\">" + inside + "</dd></dl>"
         else 
             inside
         end
         
+    end
+
+    def parseParagraph elm
+        # パラグラフ全体にスタイルがあった場合の処理
+        if pStyle = elm.elements[".//w:pStyle"] then 
+            pStyleVal = pStyle.attributes["w:val"]
+            cssName = style(pStyleVal)
+            surrounding(cssName,parseStyle(elm))
+        # スタイルのない通常のパラグラフのための処理
+        else
+            "<p>" + parseStyle(elm) + "</p>"
+        end
     end
 
     def parseStyle elm
@@ -160,29 +232,53 @@ class Doc2Txt
             #スタイルの無い通常の文の場合
             elsif normalText = e.elements[".//w:t"] then 
                 if e.get_elements(".//w:t")[1] then #一つのw:rタグ内にw:tが二つあるケースに対処するため。
-                    #.//w:tでは最初のtのみを取得するので一部の文字が消える
+                    #.//w:tでは最初のtのみを取得するので二つ以上あると一部の文字が消える
                     "\n" + e.get_elements(".//w:t")[1].text
                 else
                     normalText.text
                 end
             end
-            }.join("").chomp("") + "\n"
+            }.join("").chomp("")
+    end
+
+    #表の行をパースするための関数
+    def parseTableRow elm
+        #テーブル内の各行要素を取り出し<tr>タグで囲んで、列をパースする処理を行う
+         elm.get_elements(".//w:tr").to_a.map.with_index { |row, i|
+            "<tr>" + parseTableColumn(row,i) + "</tr>"
+            }.join("").chomp("")
+    end
+
+    #表の列をパースするための関数。第二引数で行のインデックスiを受け取りthタグとtdタグを使い分ける
+    def parseTableColumn(elm,i)
+        #テーブルの行内部の列の要素を取り出し<td>タグで囲んで、内部のテキストをパースする処理を行う
+         elm.get_elements(".//w:tc").to_a.map { |column|
+            cellData = parseParagraph(column)
+            #装飾タグがないセルにはpタグを付与する
+            if !cellData.include?("</") and !(cellData == "") then
+                cellData = "<p>" + cellData + "</p>"
+            end
+            #最初の行i=0だったらthタグを使用する。今のところthタグの必要性が不明なため-1に。
+            if i == -1 then
+                "<th>" + cellData + "</th>"
+            else
+                "<td>" + cellData + "</td>"
+            end
+            }.join("").chomp("")
     end
 
     def parse
-        # OpenXMLをパースしてテキストだけ抽出
+        # OpenXMLをパースしてテキストを抽出
         doc = REXML::Document.new(check_br(@xml_name))
 
-        data = doc.elements.to_a("//w:p").map { |elm|
-
-            #　パラグラフ全体にスタイルがあった場合の処理
-            if rStyle = elm.elements[".//w:pStyle"] then 
-                rStyleVal = rStyle.attributes["w:val"]
-                cssName = style(rStyleVal)
-                surrounding(cssName,parseStyle(elm))
-            # 通常のパラグラフのための処理
+        data = REXML::XPath.match(doc.root,'//*[self::w:tbl or self::w:p[not(ancestor::w:tbl)]]').map { |elm|
+            
+            # テーブルがあったときの処理
+            if elm.name == "tbl" then
+                "<table>" + parseTableRow(elm) + "</table>"
+            # パラグラフを処理
             else
-                parseStyle(elm) + "\n"
+                parseParagraph(elm)
             end
 
         }.join("").chomp("")
@@ -191,26 +287,17 @@ class Doc2Txt
         data.gsub!(/\n/,"<br>\n")
         add_img(data)
 
-        # t-htmlのスニペットのタグ
-        '   <!doctype html>
-        <html lang="ja">
+        #与えられたコマンドライン引数によって使用する雛形を選択
+        case ARGV[0]
+        when "lecture"
+            # t-html-lectureのスニペットのタグ
+            t_html_lecture(data)
+        else
+            # t-htmlのスニペットのタグ
+            t_html(data)
+        end
 
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
-            <link rel="stylesheet" href="../../../share/assets/css/style.css">
-            <link rel="stylesheet" href="../../../share/assets/css/overwrite.css"> </head>
 
-        <body id="index">
-            <div class="global--wrapper">
-                %s
-            </div>
-            <script src="../../../share/assets/js/jquery-2.1.4.min.js"></script>
-            <script src="https://cdn.nnn.ed.nico/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript"></script>
-        </body>
-
-        </html>' % data
-        
     end
 
     def output data
