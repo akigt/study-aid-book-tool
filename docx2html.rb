@@ -140,7 +140,9 @@ class Doc2Txt
         #メッセージ枠類
         when "af3" then #赤枠
             result = "global--block-message_strong_red"
-        when "afd" then #青枠
+        when "af7" then #緑枠
+            result = "global--block-message_strong_green"
+        when "afd" then #青枠 
             result = "global--block-message_strong_blue"
         when "aff" then #灰枠
             result = "global--block-message_strong_gray"
@@ -168,10 +170,13 @@ class Doc2Txt
         #装飾文字類
         when "aff4","af4","FF0000" then  #赤字
             result = "global--text-red"
-        when "affff1","af7","af8","afe","0000FF","0070C0" then  #青字
+        when "affff1","af8","afe","0000FF","0070C0" then  #青字
             result = "global--text-blue"
         when "affa","affffffb" then  #太字 
             result = "global--text-strong"
+        when "aff9" then  #大文字 
+            result = "global--text-big"
+            
 
         when "affffff0" then  #公式いろいろ
             result = "テスト"
