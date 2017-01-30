@@ -62,11 +62,8 @@ class Doc2Txt
     def add_img data
         id = @base_fn.split(".").first
         #通常の画像にimgタグを付ける
-        data.gsub!(/#{id}.*\.png/) { |v|
-            %Q[<div class="global--image_container">
-            <img src="#{v}" alt="">
-            </div>
-            ]
+        data.gsub!(/#{id}.*?\.png/) { |v|
+            %Q[<div class="global--image_container"><img src="#{v}" alt=""></div>]
         }
         # バルーンとセットの画像にタグ付け
         data.gsub!(/[^>]*\/share\/assets\/img\/.*\.png/) { |v|        
