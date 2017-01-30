@@ -134,6 +134,8 @@ class Doc2Txt
             result = "global--headline_1"
         when "a" then #見出し2
             result = "global--headline_2"
+        when "a3" then #見出し3
+            result = "global--headline_3"
    
         #メッセージ枠類
         when "af3" then #赤枠
@@ -182,7 +184,7 @@ class Doc2Txt
     def surrounding(cssName,inside)
         case cssName
         when /global--headline_([\w]*)/
-            "<h#{$1} class=\"global--headline_#{$1}\">" + inside + "</h#{$1}>\n"
+            "<h#{$1} class=\"global--headline_#{$1}\">" + inside + "</h#{$1}>"
         when /global--icon-point_([\w]*)/
             "<span class=\"global--icon-point_#{$1}\">" + inside + "</span>"
         when /global--text-([\w]*)/
