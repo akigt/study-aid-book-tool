@@ -129,20 +129,27 @@ class Doc2Txt
         # puts val
         case val
 
+        #見出し類
         when "a0","ab" then #見出し1 
             result = "global--headline_1"
         when "a" then #見出し2
             result = "global--headline_2"
-        # when "af1","af2" then #アノテーション
-        #     result = "annotation"
+   
+        #メッセージ枠類
         when "af3" then #赤枠
             result = "global--block-message_strong_red"
         when "afd" then #青枠
             result = "global--block-message_strong_blue"
         when "aff" then #灰枠
             result = "global--block-message_strong_gray"
-        when "afff9" then #波線の枠
+        when "afff9" then #ふきだし・バルーン用
             result = "global--balloon"
+        
+        #色付きメッセージブロック
+        when "affff7","affffe" then  #黄色のブロック、罫線なし
+            result = "global--block-message_yellow"
+        when "afffff8" then  #灰色のブロック、罫線なし
+            result = "global--block-message_gray"
         
         #ラベル類
         when "afff2" then #赤ラベル 
@@ -155,18 +162,17 @@ class Doc2Txt
             result = "global--icon-point_purple"
         when "affffff5" then #灰ラベル 
             result = "global--icon-point_gray"
+
+        #装飾文字類
         when "aff4","af4","FF0000" then  #赤字
             result = "global--text-red"
         when "affff1","af7","af8","afe","0000FF","0070C0" then  #青字
             result = "global--text-blue"
-        when "affa" then  #太字 
+        when "affa","affffffb" then  #太字 
             result = "global--text-strong"
-        # when "aff" then  #斜体 
-        #     result = "em"
+
         when "affffff0" then  #公式いろいろ
             result = "テスト"
-        when "affff7","affffe" then  #黄色の枠 
-            result = "global--block-message_yellow"
         else
             result = "undefined"
         end
