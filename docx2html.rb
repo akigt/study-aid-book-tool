@@ -256,6 +256,18 @@ class Doc2Txt
             }.join("").chomp("")
     end
 
+    def parseParagraph elm
+        # パラグラフ全体にスタイルがあった場合の処理
+        if pStyle = elm.elements[".//w:pStyle"] then 
+            pStyleVal = pStyle.attributes["w:val"]
+            cssName = style(pStyleVal)
+            surrounding(cssName,parseStyle(elm))
+        # スタイルのない通常のパラグラフのための処理
+        else
+            "<p>" + parseStyle(elm) + "</p>"
+        end
+    end
+
     def parse
         # OpenXMLをパースしてテキストを抽出
         doc = REXML::Document.new(check_br(@xml_name))
@@ -265,14 +277,9 @@ class Doc2Txt
             # テーブルがあったときの処理
             if elm.name == "tbl" then
                 "<table>" + parseTableRow(elm) + "</table>"
-            # パラグラフ全体にスタイルがあった場合の処理
-            elsif pStyle = elm.elements[".//w:pStyle"] then 
-                pStyleVal = pStyle.attributes["w:val"]
-                cssName = style(pStyleVal)
-                surrounding(cssName,parseStyle(elm))
-            # スタイルのない通常のパラグラフのための処理
+            # パラグラフを処理
             else
-                "<p>" + parseStyle(elm) + "</p>"
+                parseParagraph(elm)
             end
 
         }.join("").chomp("")
