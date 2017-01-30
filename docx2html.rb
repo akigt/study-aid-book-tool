@@ -75,6 +75,7 @@ class Doc2Txt
     end
 
     def removeUnnecessaryTag data
+        #不必要に連続するspanタグを消す。classが違い、役割も違うspanタグも消してしまうのでもっと正確な正規表現にしたい
         data.gsub!(/<\/span><span class=".*?">/,"")
         # data.gsub!(/<\/aside><aside class=".*?">/,"")
     end
@@ -146,6 +147,10 @@ class Doc2Txt
             result = "global--block-message_strong_blue"
         when "aff" then #灰枠
             result = "global--block-message_strong_gray"
+        when "af5" then #黄枠
+            result = "global--block-message_strong_yellow"
+        when "afb" then #紫枠
+            result = "global--block-message_strong_purple"
         when "afff9" then #ふきだし・バルーン用
             result = "global--balloon"
         
@@ -158,28 +163,29 @@ class Doc2Txt
         #ラベル類
         when "afff2" then #赤ラベル 
             result = "global--icon-point_red"
-        when "afffffd","afffffc","af5","af6","00FF00" then  #緑ラベル
+        when "afffffd","afffffc","af6","00FF00" then  #緑ラベル
             result = "global--icon-point_green"
         when "affffff1" then #青ラベル 
             result = "global--icon-point_blue"
-        when "affffff3" then #紫ラベル 
+        when "affffff2","affffff3" then #紫ラベル 
             result = "global--icon-point_purple"
         when "affffff5" then #灰ラベル 
             result = "global--icon-point_gray"
-
+        when "afffffa" then #黄色ラベル
+            result = "global--icon-point_yellow"
+            
         #装飾文字類
-        when "aff4","af4","FF0000" then  #赤字
+        when "aff3","aff4","af4","FF0000" then  #赤字
             result = "global--text-red"
-        when "affff1","af8","afe","0000FF","0070C0" then  #青字
+        when "affff0","affff1","af8","afe","0000FF","0070C0" then  #青字
             result = "global--text-blue"
-        when "affa","affffffb" then  #太字 
+        when "affa","affffffb","affffffa" then  #太字 
             result = "global--text-strong"
         when "aff9" then  #大文字 
             result = "global--text-big"
-            
 
-        when "affffff0" then  #公式いろいろ
-            result = "テスト"
+        # when "affffff0" then  #公式いろいろ
+        #     result = "テスト"
         else
             result = "undefined"
         end
@@ -194,8 +200,6 @@ class Doc2Txt
             "<span class=\"global--icon-point_#{$1}\">" + inside + "</span>"
         when /global--text-([\w]*)/
             "<span class=\"global--text-#{$1}\">" + inside + "</span>"
-        when "テスト"
-            "<AAAAA>" + inside + "</AAAAA>\n"
         when /global--block-message_([\w]*)/
             "<aside class=\"global--block-message_#{$1}\">" + inside + "</aside>"
         when "global--balloon"
@@ -243,8 +247,8 @@ class Doc2Txt
             if !cellData.include?("</") and !(cellData == "") then
                 cellData = "<p>" + cellData + "</p>"
             end
-            #最初の行だったらthタグを使用する
-            if i == 0 then
+            #最初の行i=0だったらthタグを使用する。今のところthタグの必要性が不明なため-1に。
+            if i == -1 then
                 "<th>" + cellData + "</th>"
             else
                 "<td>" + cellData + "</td>"
