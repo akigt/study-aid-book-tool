@@ -114,7 +114,7 @@ class Doc2Txt
             <div class="global--wrapper">
               #{data}
             </div>
-            <script src="../../../share/assets/js/jquery-2.1.4.min.js"></script>
+            <script src="../../../../share/assets/js/jquery-2.1.4.min.js"></script>
             <script src="https://cdn.nnn.ed.nico/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript"></script>
         </body>
         
