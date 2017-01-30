@@ -183,6 +183,8 @@ class Doc2Txt
             result = "global--text-strong"
         when "aff9" then  #大文字 
             result = "global--text-big"
+        when "aff2" then  #小文字 
+            result = "global--text-small"
 
         # when "affffff0" then  #公式いろいろ
         #     result = "テスト"
@@ -208,6 +210,18 @@ class Doc2Txt
             inside
         end
         
+    end
+
+    def parseParagraph elm
+        # パラグラフ全体にスタイルがあった場合の処理
+        if pStyle = elm.elements[".//w:pStyle"] then 
+            pStyleVal = pStyle.attributes["w:val"]
+            cssName = style(pStyleVal)
+            surrounding(cssName,parseStyle(elm))
+        # スタイルのない通常のパラグラフのための処理
+        else
+            "<p>" + parseStyle(elm) + "</p>"
+        end
     end
 
     def parseStyle elm
@@ -242,7 +256,7 @@ class Doc2Txt
     def parseTableColumn(elm,i)
         #テーブルの行内部の列の要素を取り出し<td>タグで囲んで、内部のテキストをパースする処理を行う
          elm.get_elements(".//w:tc").to_a.map { |column|
-            cellData = parseStyle(column)
+            cellData = parseParagraph(column)
             #装飾タグがないセルにはpタグを付与する
             if !cellData.include?("</") and !(cellData == "") then
                 cellData = "<p>" + cellData + "</p>"
@@ -254,18 +268,6 @@ class Doc2Txt
                 "<td>" + cellData + "</td>"
             end
             }.join("").chomp("")
-    end
-
-    def parseParagraph elm
-        # パラグラフ全体にスタイルがあった場合の処理
-        if pStyle = elm.elements[".//w:pStyle"] then 
-            pStyleVal = pStyle.attributes["w:val"]
-            cssName = style(pStyleVal)
-            surrounding(cssName,parseStyle(elm))
-        # スタイルのない通常のパラグラフのための処理
-        else
-            "<p>" + parseStyle(elm) + "</p>"
-        end
     end
 
     def parse
