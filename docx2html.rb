@@ -69,7 +69,7 @@ class Doc2Txt
             ]
         }
         # バルーンとセットの画像にタグ付け
-        data.gsub!(/^.*\/share\/assets\/img\/.*\.png/) { |v|        
+        data.gsub!(/[^>]*\/share\/assets\/img\/.*\.png/) { |v|        
             %Q[<dt><img src="#{v}" alt=""></dt><dd>]
         }
     end
@@ -203,7 +203,7 @@ class Doc2Txt
         when /global--block-message_([\w]*)/
             "<aside class=\"global--block-message_#{$1}\">" + inside + "</aside>"
         when "global--balloon"
-            "<dl class=\"global--balloon\">\n" + inside + "</dd></dl>"
+            "<dl class=\"global--balloon\">" + inside + "</dd></dl>"
         else 
             inside
         end
