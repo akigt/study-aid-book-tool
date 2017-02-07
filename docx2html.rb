@@ -73,7 +73,18 @@ class Doc2Txt
 
     def removeUnnecessaryTag data
         #不必要に連続するspanタグを消す。classが違い、役割も違うspanタグも消してしまうのでもっと正確な正規表現にしたい
-        data.gsub!(/<\/span><span class=".*?">/,"")
+        # data.gsub!(/<\/span><span class=".*?">/,"")
+        data.gsub!(/<dd><br>/,"<dd>")
+        # data.gsub!(/%中%\p{blank}?(.*?)/,"テスト　#{$1}")
+        data.gsub!(/<span class="(.+?)">([^<>]+?)(?=<\/span><span class="\1">)/){
+            "<span class=\"#{$1}\">#{$2}<ToBeDeleted>"}
+        data.gsub!(/<ToBeDeleted><\/span><span class="(.+?)">/,"")
+        # data.gsub!(/<ToBeDeleted>(.+?)<\/span><span class="(.+?)"><\/ToBeDeleted>/){
+        #     "#{$1}"
+        # }
+        # data.gsub!(/<\/ToBeDeleted><span class=".*?">/,"")
+        # while data.sub!(/<span class="(.+?)">(.+?)<\/span>(?=<span class="\1">)/,"<span class=\"#{$1}\">#{$1}#{$2}</ToBeDeleted>") do
+        # end
         # data.gsub!(/<\/aside><aside class=".*?">/,"")
     end
 
@@ -119,7 +130,7 @@ class Doc2Txt
         </body>
         
         </html>]
-        #jqueryの階層が違う？
+
     end
 
     # XMLから抽出した値によって適用するスタイルを変更する
@@ -283,9 +294,11 @@ class Doc2Txt
 
         }.join("").chomp("")
 
-        removeUnnecessaryTag(data)
-        data.gsub!(/\n/,"<br>\n")
+        # removeUnnecessaryTag(data)
         add_img(data)
+        data.gsub!(/\n/,"<br>\n")
+        # add_img(data)
+        removeUnnecessaryTag(data)
 
         #与えられたコマンドライン引数によって使用する雛形を選択
         case ARGV[0]
@@ -314,7 +327,7 @@ if __FILE__ == $PROGRAM_NAME
 main {
     dt = Doc2Txt.new
     #data = ARGV.select { |fn| fn =~ /.docx$/ }
-    data = Dir.glob("docx/*.docx")
+    data = Dir.glob("docx/*/*.docx")
     max_num = data.length
     n = 0
     data.each { |fn|
