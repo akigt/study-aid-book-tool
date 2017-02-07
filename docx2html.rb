@@ -18,10 +18,13 @@ class Doc2Txt
         @fn = fn
         @base_fn = fn.split("/").last
         @subject_dir = fn.split("/")[-2]
-        FileUtils.mkdir_p @xml_dir + @subject_dir
-        FileUtils.mkdir_p @html_dir + @subject_dir
-        @xml_name = File.join(@xml_dir + @subject_dir, @base_fn.split(".").first + ".xml")
-        @html_name = File.join(@html_dir + @subject_dir, @base_fn.split(".").first + ".html")
+        @xml_dest_dir = @xml_dir + @subject_dir
+        @html_dest_dir = @html_dir + @subject_dir
+        FileUtils.mkdir_p @xml_dest_dir
+        FileUtils.mkdir_p @html_dest_dir
+        FileUtils.cp(Dir.glob("docx/#{@subject_dir}/*.png"), @html_dest_dir)
+        @xml_name = File.join(@xml_dest_dir, @base_fn.split(".").first + ".xml")
+        @html_name = File.join(@html_dest_dir, @base_fn.split(".").first + ".html")
     end
 
     def extract_xml
