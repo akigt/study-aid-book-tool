@@ -17,10 +17,11 @@ class Doc2Txt
     def set fn
         @fn = fn
         @base_fn = fn.split("/").last
-        FileUtils.mkdir_p @xml_dir
-        FileUtils.mkdir_p @html_dir
-        @xml_name = File.join(@xml_dir, @base_fn.split(".").first + ".xml")
-        @html_name = File.join(@html_dir, @base_fn.split(".").first + ".html")
+        @subject_dir = fn.split("/")[-2]
+        FileUtils.mkdir_p @xml_dir + @subject_dir
+        FileUtils.mkdir_p @html_dir + @subject_dir
+        @xml_name = File.join(@xml_dir + @subject_dir, @base_fn.split(".").first + ".xml")
+        @html_name = File.join(@html_dir + @subject_dir, @base_fn.split(".").first + ".html")
     end
 
     def extract_xml
@@ -66,15 +67,15 @@ class Doc2Txt
             %Q[<div class="global--image_container"><img src="#{v}" alt=""></div>]
         }
         # バルーンとセットの画像にタグ付け
-        data.gsub!(/[^>]*\/share\/assets\/img\/.*\.png/) { |v|        
-            %Q[<dt><img src="#{v}" alt=""></dt><dd>]
+        data.gsub!(/([^>]*\/share\/assets\/img\/.*\.png)\n/) {         
+            %Q[<dt><img src="#{$1}" alt=""></dt><dd>]
         }
     end
 
     def removeUnnecessaryTag data
         #不必要に連続するspanタグを消す。classが違い、役割も違うspanタグも消してしまうのでもっと正確な正規表現にしたい
         # data.gsub!(/<\/span><span class=".*?">/,"")
-        data.gsub!(/<dd><br>/,"<dd>")
+        # data.gsub!(/<dd><br>/,"<dd>")
         # data.gsub!(/%中%\p{blank}?(.*?)/,"テスト　#{$1}")
         data.gsub!(/<span class="(.+?)">([^<>]+?)(?=<\/span><span class="\1">)/){
             "<span class=\"#{$1}\">#{$2}<ToBeDeleted>"}
